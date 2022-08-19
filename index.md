@@ -3,7 +3,7 @@ layout: default
 title: Home page
 ---
 
-# CS 201, Fall 2022 Section 103
+# CS 201, Fall 2022
 
 <div id="subtitle">Fundamentals of Computer Science II</div>
 
@@ -12,7 +12,8 @@ Welcome to the website for CS 201, Fundamentals of Computer Science II, at York 
 ## Links
 
 * [Syllabus](syllabus.html)
-* [Lecture Schedule/Readings](schedule.html)
+* [Lecture Schedule/Readings Section 102](schedule.html)
+* [Lecture Schedule/Readings Section 103](schedule-103.html)
 * [Lecture Example code](examples/index.html)
 * [Labs](labs/index.html)
 * [Assignments](assign/index.html)
