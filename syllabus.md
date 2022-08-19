@@ -10,8 +10,8 @@ title: "Syllabus"
 **Fall 2022**
 
 Instructors: 
-- 102 - Dr. Krishna Kambhampaty</a>, <kkambhampaty@ycp.edu>
-- 103 - Prof. Dean Zeller</a>, <dzeller@ycp.edu>
+- 102 - Dr. Krishna Kambhampaty, <kkambhampaty@ycp.edu>
+- 103 - Prof. Dean Zeller, <dzeller@ycp.edu>
 
 
 Office Hours:
