@@ -8,6 +8,7 @@ title: Home page
 <div id="subtitle">Fundamentals of Computer Science II, Section 103</div>
 
 Welcome to the website for CS 201, Fundamentals of Computer Science II, at York College.  All information about the course will be posted here.
+For CS 201 Section 102, please click on this link [CS201 Section 102](https://ycpcs.github.io/cs201-fall2022-102/)
 
 ## Links
 
@@ -23,7 +24,7 @@ Welcome to the website for CS 201, Fundamentals of Computer Science II, at York 
 * [CodingBat Java recursion problems](http://codingbat.com/java/Recursion-1)
 * [Practice Exams](practice/index.html)
 * [JDK 16 API documentation](https://docs.oracle.com/en/java/javase/16/docs/api/index.html)
-* [CS201 Section 102](https://ycpcs.github.io/cs201-fall2022-102/)
+* [CS 201 Section 102](https://ycpcs.github.io/cs201-fall2022-102/)
 
 ## News
 * **Aug 22** &mdash; Welcome back!
