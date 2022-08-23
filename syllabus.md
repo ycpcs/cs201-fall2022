@@ -15,8 +15,8 @@ Instructors:
 
 
 Office Hours:
-- **Dr. Kambhampaty** - KEC 115: Thu 9:30am-2:00pm, or by appointment
-- **Professor Zeller** - 10:30am-12:00 pm Wednesday and Friday or by appointment
+- **Dr. Kambhampaty** - KEC 115: Thu 9:30 am-2:00 pm, or by appointment
+- **Professor Zeller** - 10:30 am-12:00 pm Wednesday and Friday or by appointment
 
 
  Section  | Days      |  Time       | Room    | Final Exam
