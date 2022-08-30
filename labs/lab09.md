@@ -5,7 +5,7 @@ title: "Lab 9: Inheriting Fields and Methods"
 
 ## Getting Started
 
-Download [CS201\_Lab09\_Gradle.zip](CS201_Lab09_Gradle.zip). Copy and extract the zip file into your **CS201-Fall2021** directory. Import it into your **CS201-Fall2021** IntelliJ project using
+Download [CS201\_Lab09\_Gradle.zip](CS201_Lab09_Gradle.zip). Copy and extract the zip file into your **CS201-Spring2022** directory. Import it into your **CS201-Spring2022** IntelliJ project using
 
 > **File&rarr;New&rarr;Module from Existing Sources...**
 
@@ -133,7 +133,7 @@ When you are done, submit the lab to the Marmoset server using the Terminal wind
 
 <pre>
 $ <b>cd CS201_Lab09_Gradle</b>
-CS201-Fall2021/CS201_Lab09_Gradle
+CS201-Spring2022/CS201_Lab09_Gradle
 $ <b>make submit</b>
 </pre>
 
@@ -148,7 +148,7 @@ check that the files you submitted are correct.
 
 Details:
 
-         Semester:   Fall 2021
+         Semester:   Spring 2022
          Course:     CS 201
          Assignment: lab09
 
