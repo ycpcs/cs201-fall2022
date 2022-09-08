@@ -1,6 +1,11 @@
 // This file defines the class periods and final exam days.
 
 courseInfo.classPeriods = [
+
+	{
+		topic: new DoubleTopic("Lecture 0: Introduction to Java & Installing IntelliJ", "","","")
+		
+	},
 	{
 		topic: new DoubleTopic("Lecture 1: Introduction, Primitive Java", "lectures/lecture01.html","CS201_Lecture01_Gradle.zip", "examples/CS201_Lecture01_Gradle.zip"),
 		reading: "1.1&ndash;1.6",
@@ -12,11 +17,18 @@ courseInfo.classPeriods = [
 		lab: new NumberedLabGradle(2, "Coins class")
 	},
 	{
+		topic: new DoubleTopic("Lecture 2: Classes, Objects/References, Encapsulation (Continued)", "lectures/lecture02.html","CS201_Lecture02_Gradle.zip", "examples/CS201_Lecture02_Gradle.zip"),
+		reading: "2.1&ndash;2.3",
+		lab: new NumberedLabGradle(2, "Coins class")
+		
+	},
+	{
 		topic: new DoubleTopic("Lecture 3: Arrays and ArrayLists", "lectures/lecture03.html", "CS201_Lecture03_Gradle.zip", "examples/CS201_Lecture03_Gradle.zip"),
 		reading: "3.1&ndash;3.9",
 		lab: new NumberedLabGradle(3, "Arrays and ArrayLists")
 	},
-	{	{
+	
+	{
 		topic: new DoubleTopic("Lecture 4: Overloading, JUnit", "lectures/lecture04.html", "CS201_Lecture04_Gradle.zip", "examples/CS201_Lecture04_Gradle.zip"),
 		lab: new NumberedLabGradle(4, "Testing Overloaded Constructors")
 	},
@@ -150,8 +162,8 @@ courseInfo.classPeriods = [
 // It is not used if final is on last day of class"
 courseInfo.finalExamDates = [
 //		new FinalExamDay("101", new Date("12/10/2021 10:15:00")),
-//		new FinalExamDay("102", new Date("12/10/2021 12:45:00")),
-		new FinalExamDay("103", new Date("12/08/2022 12:45:00")),
+		new FinalExamDay("102", new Date("12/09/2022 15:00:00")),
+//		new FinalExamDay("103", new Date("12/08/2022 12:45:00")),
 //		new FinalExamDay("104", new Date("12/13/2019 15:00:00"))
 ];
 
