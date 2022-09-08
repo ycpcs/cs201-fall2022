@@ -1,215 +1,141 @@
 ---
 layout: default
-title: "Lecture 6: File I/O, Exceptions"
+title: "Lecture 6: Exceptions"
 ---
 
-Note: The [course notes on File I/O and Exceptions](notes/exceptionsFileIO.html) will be useful.
-
-## File I/O
-
-File I/O allows a Java program to read information from files and save information to files.
-
-There are two general kinds of file I/O: *byte* I/O and *character* I/O.
-
-Byte I/O is useful for reading from and writing to binary files.
-
-Character I/O is useful for reading from and writing to text files.
-
-The **InputStream** and **OutputStream** classes are used to read and write bytes to and from files (and other sources/destinations for binary data).
-
-The **Reader** and **Writer** classes are very much like **InputStream** and **OutputStream**, but they are used to read and write *characters* rather than bytes.
-
-All 4 of the basic Input/OutputStream and Reader/Writer classes come in many different "flavors". For example:
-
--   **FileInputStream** is an **InputStream** that reads bytes from a file
--   **FileWriter** is a **Writer** that writes characters to a file
-
-Making the situation even more complicated, some kinds of Stream and Reader/Writer classes are used as "adapters" or "wrappers" to add functionality to another Stream or Reader/Writer object. For example:
-
--   A **BufferedReader** object can be used as an adapter to make any **Reader** object capable of reading complete lines of text at a time.
--   A **Scanner** object can be used as an adapter to make any **InputStream** or **Reader** object capable of reading *tokens* of input
-
-One of the keys to writing code to do file I/O in Java is knowing which classes, or combinations of classes, you need to use.
-
-## Reading characters from a file
-
-Here's a program to read every character of text from a **FileReader**, and count the number of occurrences of the vowels A, E, I, O, and U.
-
-{% highlight java %}
-package edu.ycp.cs201.countvowels;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
-
-public class CountVowels {
-    public static void main(String[] args) throws IOException {
-        Scanner keyboard = new Scanner(System.in);
-
-        String fileName;
-        System.out.println("Which file? ");
-        fileName = keyboard.next();
-
-        FileReader reader = new FileReader(fileName);
-
-        int vowelCount = 0;
-
-        while (true){
-            int c = reader.read();
-
-            if (c < 0) {
-                break;
-            }
-
-            char ch = (char) c;
-
-            ch = Character.toLowerCase(ch);
-            if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
-                vowelCount++;
-            }
-        }
-        reader.close();
-
-        System.out.println("The file contains " + vowelCount + " vowel(s)");
-    }
-}
-{% endhighlight %}
-
-Note that when the **read** method returns a negative value, it means that the reader has reached the end of the input file, and there are no more text characters to be read.
-
-Also note that after the program is done using a Stream or a Reader/Writer, it is important to call the **close** method on the object.
-
-Assume that the file **myFile.txt** contains the following text:
-
-    Fourscore and seven years ago...
-
-Running the **CountVowels** program on that file produces the following output:
-
-<pre>
-Which file?
-<b>myFile.txt</b>
-The file contains 11 vowel(s)
-</pre>
-
-## Reading all lines of text from a file
-
-The **BufferedReader** class is handy for reading a text file line-by-line.
-
-Here is a program to find the longest line in an input text file:
-
-{% highlight java %}
-package edu.ycp.cs201.countvowels;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
-
-public class FindLongestLine {
-    public static void main(String[] args) throws IOException {
-        Scanner keyboard = new Scanner(System.in);
-
-        System.out.println("Which file?");
-        String fileName = keyboard.next();
-
-        FileReader fileReader = new FileReader(fileName);
-        BufferedReader reader = new BufferedReader(fileReader);
-
-        int longest = 0;
-
-        while (true) {
-
-            String line = reader.readLine();
-            if (line == null) {
-                break;
-            }
-
-            if (line.length() > longest) {
-                longest = line.length();
-            }
-        }
-
-        reader.close();
-
-        System.out.println("The longest line contained " + longest + " character(s)");
-    }
-}
-{% endhighlight %}
-
-Note several interesting things going on in this program.
-
-The **BufferedReader** object serves as an "adapter" or "wrapper" for the **FileReader**. That means that the **BufferedReader** object uses the **FileReader** object for reading characters, but adds some additional capabilities (specifically, the ability to read complete lines of text.) Here's a picture showing how this works:
-
-> ![image](figures/cs201_lecture6_readers.png)
-
-The **BufferedReader** object contains a reference to the underlying **FileReader** object in one of its (private) fields.
-
-Also note that the **BufferedReader**'s **readLine** method returns the special **null** reference after all of the lines of text in the file have been read.
-
-Finally, note that calling the **close** method on the **BufferedReader** causes the underlying **FileReader** to be closed.  In general, when your program uses an adapter for a closeable resource such as a reader or writer, the program should call **close** on the adapter.
-
-<div class="callout">
-Always close the adapter.
-</div>
-
-Running the program on the same text file as the previous example:
-
-<pre>
-Which file?
-<b>myFile.txt</b>
-The longest line contained 32 character(s)
-</pre>
-
-## Writing to a text file
-
-The **FileWriter** class is useful for writing text to a text file.
-
-Demo program:
-
-{% highlight java %}
-package edu.ycp.cs201.countvowels;
-
-import java.io.FileWriter;
-import java.io.IOException;
-
-public class WriteToFile {
-    public static void main(String[] args) throws IOException {
-        FileWriter writer = new FileWriter("pandp.txt");
-
-        writer.write("It is a truth universally acknowledged, that a single man in\n");
-        writer.write("possession of a good fortune, must be in want of a wife.\n");
-
-        writer.close();
-
-        System.out.println("File written successfully!");
-    }
-}
-{% endhighlight %}
-
-Note that when calling the **write** to write a string of text, you must manually insert newlines (**\\n**) whenever you want to end a line and begin a new line.
-
-This program writes the first sentence of *Pride and Prejudice* to a file called **pandp.txt**. Running the program produces the following output:
-
-    File written successfully!
-
-After you run the program, right-click on the name of the project and choose **Refresh**. You will see a text file called **pandp.txt** appear in the project. When you open the file, you should see the two files written.
+Note: The [course notes on File I/O and Exceptions](../notes/exceptionsFileIO.html) will be useful.
 
 ## Exceptions
 
-Note that each demo program had a **main** method that looked like this:
+An *exception* in Java is an unexpected event which makes further progress within a method impossible.
+
+For example, we saw last time that when we try to open a file using a **FileInputStream** or **FileReader**, but the file we're trying to open doesn't exist, a **FileNotFoundException** occurs. Because the file cannot be opened, it makes no sense to continue executing the code that will read from the file.
+
+Exceptions are objects. There are some useful methods you can call on an exception object to find out what event caused the exception.
+
+## Kinds of exceptions
+
+There are two main kinds of exceptions in Java: *checked* and *unchecked*.
+
+A *checked* exception is one where the occurrence of the exception is expected at least occasionally: **FileNotFoundException** is a good example, because it's common for a user to type the name of a file that doesn't exist. If it is possible for a checked exception to occur in a method, the method must deal with the exception by either
+
+1.  *handling* it using **try/catch**
+2.  throwing it out of the method
+
+Option number 2 is the one you will want to use 90% of the time. Handling an exception using **try/catch** should only be done at a point in the program where there is a reasonable way to recover from the exception.
+
+An *unchecked* exception is one that typically indicates a bug in the program. For example, dereferencing a null reference (**NullPointerException**), or dividing by zero (**ArithmeticException**). Unchecked exceptions do not have to be dealt with explicitly, and, in general, should not be handled.
+
+## The exception hierarchy
+
+[This will make a bit more sense when we talk about inheritance.]
+
+Java has a hierarchy of exception classes:
+
+> <img style="width: 36em;" alt="Java exception hierarchy" src="figures/exceptHier.png">
+
+The boxes are the exception classes. The arrows represent *Is-A* relationships. For example, an **ArithmeticException** is a **RuntimeException**. That means that aritmetic exceptions are a "kind of" runtime exception.
+
+All exception classes that are subclasses of **Exception** but not subclasses of **RuntimeException** are checked exceptions. All other exception classes are unchecked exceptions.
+
+## Throwing an exception out of a method
+
+The simplest, and usually best, way to deal with an exception that can occur in a method is to *avoid dealing with it*. This option is *throwing the exception out of the method*. To throw a particular class of exceptions out of the method, add a **throws** clause to the method. Example: a method to read the first line of a file and return it as a String:
 
 {% highlight java %}
-public static void main(String[] args) throws IOException {
+public static String readFirstLine(String fileName) throws IOException {
+    FileReader fr = new FileReader(fileName);
+    BufferedReader br = new BufferedReader(fr);
+    String firstLine = br.readLine();
+    br.close();
+    return firstLine;
+    // Note: there's something wrong with this method -
+    //       see below under "try/finally"
+}
 {% endhighlight %}
 
-The **throws Exception** part is required because operations such as opening a file, reading from a file, or writing to a file can cause an *exception* to be thrown. Exceptions are a feature of the Java language for allowing programs to handle "exceptional" situations. We will talk more about exceptions next time.
+By declaring the method **throws IOException**, any **FileNotFoundException** or **IOException** occurring when the method is executed will immediately terminate the method and *propagate the exception to the caller*. In other words, throwing an exception out of a method makes the caller deal with the exception. This is really important:
+
+> **Throwing an exception out of a method transfers the responsibility for dealing with the exception to the caller.**
+
+## Handling an exception using try/catch
+
+In the event that you actually need to handle and recover from an exception, you can use a **try/catch** block.
+
+The **try** block executes some code that might cause an exception to occur. The **catch** block executes some recovery code to be executed in the event that an exception actually does occur.
+
+Example: here's how the code that calls the **readFirstLine** method might use a **try/catch** to handle an recover from an **IOException**:
+
+{% highlight java %}
+try {
+    // The readFirstLine() method might throw a
+    // FileNotFoundException or an IOException
+    String firstLine = readFirstLine("pandp.txt");
+
+    System.out.println("The first line of pandp.txt is:");
+    System.out.println(firstLine);
+} catch (IOException e) {
+    System.out.println("Error: " + e.getMessage());
+}
+{% endhighlight %}
+
+Any number of **catch** blocks can be added to a single **try**. For example, we could handle the occurrence of a **FileNotFoundException** separately:
+
+{% highlight java %}
+try {
+    // The readFirstLine() method might throw a
+    // FileNotFoundException or an IOException
+    String firstLine = readFirstLine("pandp.txt");
+
+    System.out.println("The first line of pandp.txt is:");
+    System.out.println(firstLine);
+} catch (FileNotFoundException e) {
+    System.out.println("pandp.txt doesn't seem to exist, old chap!");
+} catch (IOException e) {
+    System.out.println("Error: " + e.getMessage());
+}
+{% endhighlight %}
+
+## Cleaning up using try/finally
+
+Recall that we noted that something was wrong with our **readFirstLine** method.
+
+What's wrong with the method is somewhat subtle:
+
+-   If the file is opened successfully, **and**
+-   an **IOException** occurs trying to read a line from the file, **then**
+-   the reader will not be closed
+
+We should always close streams/readers/writers when we're done using them. Exceptions can make guaranteeing that these objects are closed a bit tricky. Fortunately, a construct called **try/finally** helps us ensure that cleanup code is executed both
+
+-   when the method completes succesfully, or
+-   when the method is abruptly terminated due to an exception
+
+Here's the fixed version
+
+{% highlight java %}
+public static String readFirstLine(String fileName) throws IOException {
+    FileReader fr = new FileReader(fileName);
+    BufferedReader br = new BufferedReader(fr);
+	String firstLine;
+	
+    try {
+        firstLine = br.readLine();
+    } finally {
+        br.close();
+    }
+    return firstLine;
+}
+{% endhighlight %}
+
+The **finally** block is executed regardless of whether or not an exception occurs executing the code in the **try** block. This makes sure that we are guaranteed to call the **close** method on the **BufferedReader** object.
 
 ## Summary
 
--   **InputStream**s and **OutputStream**s are used for binary I/O: input and output with raw *bytes* of data. A byte is an 8-bit integer. All data is represented as a sequence of bytes.
--   **Reader**s and **Writer**s are used for text I/O: input and output using text characters. Text I/O is generally more useful than binary I/O, because information stored as text is meaningful not only to computers but also to people.
--   **InputStream**s, **OutputStream**s, **Reader**s, and **Writer**s come in different "varieties". For example, a **FileReader** is a variety of **Reader** useful for reading text from a file.
--   A **BufferedReader** object can *adapt* another **Reader** object to enable it to read complete lines of text using the **readLine** method.
--   **InputStream**s, **OutputStream**s, **Reader**s, and **Writer**s should be *closed* when the program is done using them. This is done by calling the **close** method. A program that fails to close a stream, reader, or writer has a *resource leak*.
--   *Exceptions* can occur when doing input and output. An exception is an anomalous event that means that execution of the program cannot continue normally. A method can be declared to *throw* a particular kind of exception.
+-   Exceptions are anomalous events that mean that the execution of the program cannot continue normally.
+-   Exceptions can be *checked* or *unchecked*.
+-   A method in which a checked exception can occur must "deal with" the exception by either handling the execption using **try**/**catch** or by throwing the exception out of the method using a **throws** clause.
+-   Throwing a method out of a method transfers responsibility for dealing with the exception to the caller.
+-   Most of the time throwing the exception out of the method is the best choice. **try**/**catch** should only be used at points in the program where there is a reasonable way to *recover* from the exception, for example by allowing the user to re-enter some input.
+-   *Runtime exceptions* are a specific kind of unchecked exception that indicate that there is a bug in the program. Programs should generally never using **try**/**catch** to handle runtime exceptions: instead, you should fix the bug so that the runtime exception does not occur.
 

@@ -1,203 +1,98 @@
 ---
 layout: default
-title: "Lecture 8: Inheritance"
+title: "Lecture 8: Inheritance (continued)"
 ---
 
-<!--
 Note: The [course notes on objects, arrays, and references](../notes/objectsArraysReferences.html) will be useful.
--->
 
-## Inheritance
+[Here](images/CS201_lecture7_inheritance.pdf) is the sample code with explanatory annotations.
 
-In addition to *encapsulation*, *inheritance* is a key aspect of object-oriented programming.
+## Inheritance of fields and methods
 
-Inheritance is an *IS-A* relationship between two classes. This allows us to create a new class by *extending* an existing one, i.e. using an existing one and implementing/adding features *specific* to our derived class.
+When a superclass defines a field or non-private method, it is *inherited* by all subclasses.
 
-For example, consider the classes **Vehicle**, **Car**, **Boat**, and **Airplane**.
+So,
 
-> A **Car** *is a* **Vehicle**.
-> A **Boat** *is a* **Vehicle**.
-> An **Airplane** *is a* **Vehicle**.
+-   when a superclass defines a field, the field exists in all subclass objects
+-   when a superclass defines a non-private method, it may be called on an instance of any subclass
 
-We describe IS-A relationships using a *class hierarchy diagram*:
+## Access modifiers
 
-> ![image](figures/classHier.png)
+We can specify *access modifiers* on fields and methods to restrict how they may be accessed. Java supports four access modifiers:
 
-The **Car**,. **Boat**, and **Airplane** classes *inherit from* the **Vehicle** class.
+-   **public**: any class may access the field or method
+-   **private**: only the class containing the field or method may access it
+-   **protected**: like private, but subclasses may also access the field or method
+-   "package-protected": if you do not explicitly specify an access modifier, it is *package-protected*. All classes in the same package may access the field or method. Curiously, subclasses may access a *package-protected* field or method, even if they are in a different package.
 
-### Superclasses and subclasses
+Even though Java supports four access modifiers, most of the time you will only use **public** and **private**.
 
-In this class hierarchy, **Vehicle** is the *superclass* of **Car**, **Boat**, and **Airplane**.
+Some rules of thumb:
 
-Equivalently, **Car**, **Boat**, and **Airplane** are *subclasses* of **Vehicle**.
+-   All instance fields should be **private**.
+-   All methods that are part of a class's "public interface" -the methods that perform the essential operations on instances of the class - should be **public**
+-   All methods that are not part of the class's public interface should be **private**
 
-Because classes are data types, we also describe an inheritance relationship as a *supertype*/*subtype* relationship.
+One interesting consequence of these rules is that subclasses will not be allowed to directly access instance fields defined in the superclass. This is actually a good thing: it allows you to freely modify the fields in the superclass without affecting the subclasses in any way. (This is why **protected** fields are a bad idea - they make subclasses too sensitive to changes in the superclass.)
 
-## When Inheritance is Useful
+## Defining Concrete Fields and Methods in a Superclass
 
-Inheritance is useful when you have a collection of classes which both *common characteristics* and *behavioral differences*.
+Sometimes it can be useful to define concrete (non-abstract) fields and methods in superclasses.
 
-The common characteristics of the classes are embodied in the *superclass*. The most important kind of commonality in classes related by inheritance is that they support a common set of *operations* (methods).
+You should do this **only** when the field and/or methods represent properties that are truly common to all subclasses.
 
-For example, let's say that **Car**, **Boat**, and **Airplane** classes support the following operations:
-
--   They can start a trip
--   They can move over/through terrain
--   They can end a trip
-
-These common operations become the methods of the **Vehicle** class, which is the superclass of all three classes.
-
-There are *behavioral* differences in the three classes because they *implement* the common operations differently:
-
--   A car can start a trip, move, and end a trip only where there are roads. (Airports and marinas are considered to have roads.)
--   A boat can start a trip, move, and end a trip only where there is water. (A marina is considered to have water.)
--   An airplane can move over any kind of terrain, but must start and end its trip at airports.
-
-So, for example, if we call the **startTrip** method on an **Airplane** object, it will only succeed if the **Airplane** is currently located at an airport.
-
-## Abstract Methods and Classes
-
-Typically, the methods in the superclass that embody the common operations (methods) shared by subclasses will be *abstract*. This sense of *abstract* means that there is no way to concretely what the operation does unless we know what kind (subclass) of object it is called on.
-
-Because they usually have abstract methods, superclasses are ususally *abstract classes*. An abstract class cannot be directly instantiated.
-
-For example, if I told you I arrived at work in a **Vehicle**, that tells you nothing about whether I arrived by ground, air, or water. That's because you don't know what specific *kind* of **Vehicle** I arrived in.
-
-## The Liskov Substitution Principle, Polymorphism
-
-A simple rule called the *Liskov Substitution Principle* explains how to use inheritance in a program. It states:
-
-> Anywhere in a program an instance of a superclass may be used, an instance of a subclass may be used.
-
-So, if we have a method that takes a parameter whose type is **Vehicle**, we can pass that method a reference to a **Car**, **Boat**, or **Airplane**, since those are all subclasses of **Vehicle**.
-
-The Liskov Substitution Principle allows object-oriented programs to exhibit *polymorphism*. Polymorphism means that a variable with type *A* might, when the program runs, actually refer to an object of type *B*, *C*, *D*, etc. This is possible as long as *B*, *C*, and *D* are all subclasses of *A*.
-
-## An Example
+Example:
 
 {% highlight java %}
-public enum Terrain {
-    ROAD,
-    AIRPORT,
-    WATER,
-    MARINA,
-    FIELD,
-    FOREST,
-    MOUNTAIN;
-}
-
 public abstract class Vehicle {
+    private double maxSpeed;
+
+    public Vehicle(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+    }
+
+    public double getMaxSpeed() {
+        return maxSpeed;
+    }
+
     public abstract boolean startTrip(Terrain t);
     public abstract boolean endTrip(Terrain t);
     public abstract boolean move(Terrain t);
 }
+{% endhighlight %}
 
+Now all classes that inherit from the **Vehicle** superclass will have a **double** field called **maxSpeed**, and an instance method called **getMaxSpeed** which returns the value of that field.
+
+Note that the **Vehicle** class is still abstract because it has abstract methods.
+
+### Invoking a superclass constructor from a subclass
+
+When a superclass has instance fields, these fields exist in all instances of subclasses. So, constructors for subclasses will need a way to initialize these fields.
+
+However, because instance fields are typically private, subclasses cannot access them directly. For example, here is a **Car** class that does not compile:
+
+{% highlight java %}
 public class Car extends Vehicle {
-    public boolean endTrip(Terrain t) {
-        if ( t == Terrain.AIRPORT || t == Terrain.MARINA ) {
-            return true;
-        } else {
-            return false;
-        }
+    public Car(double maxSpeed) {
+        // this doesn't work because the
+        // the maxSpeed field is private
+        // in the Vehicle class
+        this.maxSpeed = maxSpeed;
     }
 
-    public boolean move(Terrain t) {
-        if ( t == Terrain.AIRPORT || t == Terrain.MARINA || t == Terrain.ROAD ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean startTrip(Terrain t) {
-        if ( t == Terrain.AIRPORT || t == Terrain.MARINA ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    // ...definitions of startTrip, endTrip, and move methods...
 }
 {% endhighlight %}
 
-A **Trip** consists of a sequence of **Terrain** values:
+The solution to this problem is for the **Car** class's constructor to call the **Vehicle** class's constructor. This is done using the **super** keyword. The call to the superclass's constructor must be the first line of code in the subclass's constructor:
 
 {% highlight java %}
-public class Trip {
-    private Terrain[] hops;
-
-    public Trip(int numHops) {
-        if (numHops < 2) {
-            throw new IllegalArgumentException("Trips must have at least a start and finish");
-        }
-        this.hops = new Terrain[numHops];
+public class Car extends Vehicle {
+    public Car(double maxSpeed) {
+        // call superclass (Vehicle) constructor
+        super(maxSpeed);
     }
 
-    public void setHop(int hop, Terrain t) {
-        hops[hop] = t;
-    }
-
-    public boolean isTripPossible(Vehicle v) {
-        // Check the first hop
-        if (!v.startTrip(hops[0])) {
-            return false;
-        }
-
-        // Check all hops between the first and last
-        for (int i = 1; i < hops.length - 1; i++) {
-            if (!v.move(hops[i])) {
-                return false;
-            }
-        }
-
-        // Check the last hop
-        if (!v.endTrip(hops[hops.length - 1])) {
-            return false;
-        }
-
-        // success!
-        return true;
-    }
-}
-{% endhighlight %}
-
-The **isTripPossible** method of the **Trip** class takes a **Vehicle** as a parameter, and returns true or false depending on whether or not the **Vehicle** can successfully complete the trip. We see polymorphism at work because an instance of any subclass of **Vehicle** may be passed to **isTripPossible**.
-
-We can use the **Trip** class to write JUnit tests which test the **Car** class.
-
-For example, a trip starting at an airport, continuing through roads, and ending at a marina is a legal trip. A trip blocked by a terrain type inaccessible to a **Car**, such as **WATER**, is not a legal trip.
-
-{% highlight java %}
-public class CarTest extends TestCase {
-    private Trip legalTrip;
-    private Trip illegalTrip;
-    private Car myCar;
-
-    protected void setUp() throws Exception {
-        // a Trip that can be completed by Car
-        legalTrip = new Trip(4);
-        legalTrip.setHop(0, Terrain.AIRPORT);
-        legalTrip.setHop(1, Terrain.ROAD);
-        legalTrip.setHop(2, Terrain.ROAD);
-        legalTrip.setHop(3, Terrain.MARINA);
-
-        // a Trip that cannot be completed by Car
-        // because it contains a hop through WATER
-        illegalTrip = new Trip(5);
-        illegalTrip.setHop(0, Terrain.AIRPORT);
-        illegalTrip.setHop(1, Terrain.ROAD);
-        illegalTrip.setHop(2, Terrain.ROAD);
-        illegalTrip.setHop(3, Terrain.WATER);   // Not possible by Car!
-        illegalTrip.setHop(4, Terrain.MARINA);
-
-        myCar = new Car();
-    }
-
-    public void testLegalTrip() throws Exception {
-        assertTrue(legalTrip.isTripPossible(myCar));
-    }
-
-    public void testIllegalTrip() throws Exception {
-        assertFalse(illegalTrip.isTripPossible(myCar));
-    }
+    // ...definitions of startTrip, endTrip, and move methods...
 }
 {% endhighlight %}

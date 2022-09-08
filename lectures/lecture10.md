@@ -1,222 +1,219 @@
 ---
 layout: default
-title: "Lecture 10: Type casts, instanceof, Object class, Interfaces"
+title: "Lecture 10: GUIs and MVC"
 ---
 
-Note: The [course notes on objects, arrays, and references](../notes/objectsArraysReferences.html) will be useful.
+## GUIs
 
-## Instanceof, Type casts
+We will be doing several programming assignments involving the creation of simple GUIs. Here is a quick overview of how GUIs work in Java.
 
-Sometimes it is useful to find out whether a superclass reference points to an instance of a particular subclass. We can do so using the **instanceof** operator. For example:
+## Events
+
+Programs which have a graphical user interface are *event-driven*. That means that the program does not "do anything" unless an event occurs. Example of events are things like
+
+-   mouse clicks
+-   moving the mouse
+-   pressing a button
+
+The program responds to events by establishing a *handler* for the event. An event handler is simply a method which is called whenever the event occurs. Handlers are specific to a particular window or GUI component. For example, if your program has multiple windows, then you will probably have one handler for each window.
+
+## Frames and Panels
+
+A *frame* is a top-level window. Generally, a frame is only used as a container for other GUI components. In Java, an instance of the **JFrame** class represents a frame.
+
+A *panel* is a rectangular region of a window. Panels are often used as a container for components such as buttons, text boxes, etc. Another use for panels is as a surface for drawing graphics; this is the way we will usually be using panels in this course. In Java, an instance of the **JPanel** class represents a panel.
+
+## paint() and repaint()
+
+To use a **JPanel** instance for drawing graphics, you can do the following:
+
+-   create your own class as a subclass of **JPanel**
+-   define a method called **paint** in your subclass
+
+The **paint** method will be called whenever the contents of your panel need to be redrawn. Note that drawing is event-driven; a call to the **paint** method is made automatically whenever a "window expose" event occurs, where a previously-hidden area of the panel becomes visible.
+
+A **paint** method looks like this:
 
 {% highlight java %}
-public void startTrip(Vehicle v) {
-  if (v instanceof Airplane) {
-    // v points to an instance of Airplane
-  }
+public void paint(Graphics g) {
+    ...
 {% endhighlight %}
 
-Once we know for certain that a reference refers to an instance of a particular subclass, we can use a *type cast* to convert the reference to the subclass type. E.g.:
+The parameter is a reference to an object whose type is **java.awt.Graphics**. A **Graphics** object has a large number of methods to perform drawing operations within whatever component is being drawn (e.g., the contents of your panel).
+
+Example: drawing a solid blue rectangle:
 
 {% highlight java %}
-public void startTrip(Vehicle v) {
-  // Note: in general, this is not a good idea
-  if (v instanceof Airplane) {
-    Airplane a = (Airplane) v;
-    a.retractLandingGear();
-  }
+g.setColor(Color.BLUE);
+g.fillRect(100, 75, 200, 100);
 {% endhighlight %}
 
-Both **instanceof** and type casts should be used sparingly, if at all. It is better object-oriented design to define common operations supported by *all* subclasses, and let the subclasses implement them appropriately, rather than sprinkling the code with **instanceof** checks leading to casts and calling subclass methods.
+The rectangle drawn by the code above has its upper-left corner at position x=100, y=75, is 200 pixels wide, and 100 pixels high. Note that in Java graphics, y coordinates increase towards lower points on the screen (i.e., going down).
 
-## java.lang.Object
+If, in response to an event, you would like to *force* your panel to be redrawn, simply call the **repaint** method. This method takes no arguments. **You should NEVER call the paint() method directly in an event driven system!**
 
-Every class in Java is a subclass of the class **java.lang.Object**. If you don't specify a superclass when you define a class, it will be a direct subclass of **java.lang.Object**.
+## MVC architecture
 
-One reason that the **Object** class is useful is that it defines some methods that are useful for all objects. For example, the **equals** method:
+Often times event driven systems will be designed using the **M**odel, **V**iew, **C**ontroller architecture (MVC). This architecture consists of three components that handle different aspects of the program:
+
+-   **Model** - a set of state variables that store the current values of the system *independently* of how they are displayed. This typically will be a separate class with only fields, getters, and setters, i.e. no logic.
+-   **View** - a rendering class that uses an *instance* of a model class to produce a visualization, e.g. GUI or console. The view should **NOT** modify the model.
+-   **Controller** - a class that provides the connection between the view and the model usually through event handlers, i.e. when an event occurs, the controller decides if/how the model needs to be updated and then refreshes the view to display the updated state.
+
+Many times in graphics applications that only have a single view, the view and controller classes are combined into a view-controller class that handles accepting UI events, updating the model accordingly, and then redrawing the graphics window.
+
+Note that by maintaining a model *separate* from the view, we are not locked in to a *single* display format. Instead, we could create several alternative views that use the same model to display the information in different ways.
+
+### A complete example
+
+As a simple example program, we will implement a GUI application with a model that contains a single integer counter and a color index. Each time the mouse is clicked, the count increases. Mouse clicks also cause a rectangle displayed in the window to change color.
+
+The comments in the example explain what the code is doing.
+
+Here is the **CountModel** class:
 
 {% highlight java %}
-public boolean equals(Object o) {
-  ...
-{% endhighlight %}
+import java.awt.Color;
 
-This method can be called on an object to compare it for equality with another object:
+public class CountModel {
+	// Fields for the system state
+	private int count;
+	private int colorIndex;
 
-{% highlight java %}
-public void someMethod(String s1, String s2) {
-  if (s1.equals(s2)) {
-     // s1 and s2 are identical
-  }
+    // as the count increases, the rectangle will cycle through these colors
+    public static final Color[] colors = { Color.RED, Color.GREEN, Color.BLUE };
+	
+	// Model constructor
+	public CountModel() {
+		count = 0;
+		colorIndex = 0;
+	}
+	
+	// Model getter methods
+	public int getCount() {
+		return count;
+	}
+	
+	public int getColorIndex() {
+		return colorIndex;
+	}
+	
+	// Increment count method
+	public void incrementCount() {
+		count++;
+	}
+	
+	// Increment color cyclically
+	public void incrementColorIndex() {
+		colorIndex = (colorIndex+1)%colors.length;
+	}
 }
 {% endhighlight %}
 
-Note that the equality operator (==) compares two references to see whether or not they point to the same object. Demonstration:
+
+Here is the **CountFrame** class:
 
 {% highlight java %}
-String s1, s2;
-char[] a = { 'F', 'o', 'o', 'b', 'a', 'r' };
-s1 = "Foobar";
-s2 = "";
-for (int i = 0; i < a.length; i++) {
-  s2 = s2 + a[i];
-}
-System.out.println(s1.equals(s2)); // prints "true"
-System.out.println(s1 == s2);      // prints "false"
-{% endhighlight %}
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
-So: if you want to compare two objects to see if they have *the same contents*, use the **equals** method, not the equality operator.
+public class CountFrame extends JFrame {
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                CountFrame frame = new CountFrame();
 
-You can define your own **equals** method in your own classes. It should look like this:
+                // embed a CountPanel in the frame
+                frame.add(new CountPanel());
 
-{% highlight java %}
-public class MyClass {
-  private int value;
+                // "packing" the frame causes it to adjust its size based
+                // on the panel's preferred size
+                frame.pack();
 
-  ...
+                // when the frame is closed, exit the program
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-  public boolean equals(Object o) {
-    if (o == null || !(o instanceof MyClass)) {
-      return false;
+                // making the frame visible starts the program
+                frame.setVisible(true);
+            }
+        });
     }
-    MyClass other = (MyClass) o;
-    if (this.value == other.value) { // compare fields
-      return true;
-    } else {
-      return false;
-    }
-  }
-{% endhighlight %}
-
-Another useful methods in **java.lang.Object** is **toString** (convert an object into a string).
-
-Another reason why the **Object** class is useful is that it can be used as a *generic type*: we will explore this idea further in [Lecture 10](lecture10.html).
-
-## Interfaces
-
-An interface is a completely abstract class. It can define abstract methods, but cannot define fields or concrete methods.
-
-When a class is a subclass of an interface, we say that the class *implements* the interface.
-
-Interfaces are useful because, while a class may have only one superclass, it may implement any number of interfaces.
-
-Example:
-
-> ![image](figures/ifaceExample.png)
-
-A **Horse** is both a **Vehicle** and an animal. It can support operations defined for vehicles---**startTrip**, **move**, **endTrip**---and can also support any operations defined for animals, such as **numberOfLegs**, **makeSound**, etc.
-
-We can make this work in Java as long as either **Vehicle** or **Animal** is an interface. Since we have made **Vehicle** a class, we'll make **Animal** an interface.
-
-{% highlight java %}
-public interface Animal {
-  public int numberOfLegs();
-  public void makeSound();
-}
-
-public class Horse extends Vehicle implements Animal {
-  public Horse(double maxSpeed) {
-    super(maxSpeed);
-  }
-
-  public boolean startTrip(Terrain t) {
-    return canMove(t);
-  }
-
-  public boolean move(Terrain t) {
-    return canMove(t);
-  }
-
-  public boolean endTrip(Terrain t) {
-    return canMove(t);
-  }
-
-  private boolean canMove(Terrain t) {
-    // horses can go anywhere except water
-    return t != Terrain.WATER;
-  }
-
-  public double getSpeed(Terrain t) {
-    if (t == Terrain.FIELD) {
-      // half speed
-      return 0.5 * getMaxSpeed();
-    } else if (t == Terrain.MOUNTAIN) {
-      // quarter speed
-      return 0.25 * getMaxSpeed();
-    } else {
-      return getMaxSpeed();
-    }
-  }
-
-  public int numberOfLegs() {
-    return 4;
-  }
-
-  public void makeSound() {
-    System.out.println("Neigh");
-  }
 }
 {% endhighlight %}
 
-## Comparable
+There is no important behavior in the **CountFrame** class -it is simply a container for a **CountPanel**, which is where everything interesting will happen.
 
-Java defines a number of standard interfaces that you can have your own classes implement. One such interface is **java.lang.Comparable**. The **Comparable** interface looks something like this:
+Here is the **CountPanel** class:
 
-    public interface Comparable {
-      public int compareTo(Object o);
+{% highlight java %}
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JPanel;
+
+public class CountPanel extends JPanel {
+    // constants defining the preferred width and height of the panel
+    private static final int WIDTH = 400;
+    private static final int HEIGHT = 300;
+
+    // this font will be used to display the count
+    private static final Font font = new Font("Dialog", Font.BOLD, 48);
+
+    // field storing the current model
+    private CountModel countModel;
+
+    // constructor
+    public CountPanel() {
+    	// Initialize model
+        countModel = new CountModel();
+
+        setBackground(Color.GRAY);
+
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        // install event handlers
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                handleMouseClick(e);
+            }
+        });
     }
 
-The **compareTo** method is similar to the **equals** method defined in **java.lang.Object**, except that instead of comparing against another object to see if the objects are equal, **compareTo** compares against another object to see if it is less than, equal to, or greater than the instance on which **compareTo** is called. The return value indicates the result of the comparison:
+	// Controller methods (event handlers)
+    private void handleMouseClick(MouseEvent e) {
+        // change the "state" of the model on mouse click
+        countModel.incrementCount();
+        countModel.incrementColorIndex();
 
--   a negative value means that this object is less than the compared (parameter) object
--   zero means the objects are equal
--   a positive value means that this object is greater than the compared (parameter) object
+        // now that the state is changed,
+        // redraw the panel to reflect the state change
+        repaint();
+    }
 
-This is useful to allow objects to be ranked against each other.
+	// View methods (paint)
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g); // call the superclass's paint() method to paint the background
 
-For example, the **String** class implements the **Comparable** interface. Its **compareTo** method compares string values using lexicographical comparison, which is a generalization of alphabetical order.
+        // draw the rectangle
+        g.setColor(countModel.colors[countModel.getColorIndex()]);
+        g.fillRect(20, 20, WIDTH - 40, HEIGHT - 40);
 
-### Implementing Comparable
-
-Say we have an **Employee** class and that we want to have **Employee** implement the **Comparable** interface. 
-
-{% highlight java %}
-public class Employee implements Comparable {
-  private String lastName;
-  private String firstName;
-  private int salary;
-
-  ...
-{% endhighlight %}
-
-We must define *how* **Employee** objects are to be compared by implementing the **compareTo()** method. We'll choose that **Employee** objects are compared first by last name, then by first name, then by salary:
-
-{% highlight java %}
-public int compareTo(Object o) {
-  Employee other = (Employee) o;
-
-  int cmp;
-
-  // compare last names
-  cmp = this.lastName.compareTo(other.lastName);
-  if (cmp != 0) {
-    return cmp;
-  }
-
-  // last names are the same - compare first names
-  cmp = this.firstName.compareTo(other.firstName);
-  if (cmp != 0) {
-    return cmp;
-  }
-
-  // last and first names are the same - compare salaries
-  if (this.salary < other.salary) {
-    return -1;
-  } else if (this.salary == other.salary) {
-    return 0;
-  } else {
-    return 1;
-  }
+        // draw the count
+        g.setFont(font);
+        g.setColor(Color.WHITE);
+        g.drawString("" + countModel.getCount(), 50, 150);
+    }
 }
 {% endhighlight %}
 
-Note that the **compareTo()** method takes a parameter of type **Object** thus we must *cast* it to an **Employee** object before using it. This can be problematic since the method itself will not prevent other non-**Employee** objects from being passed to the **compareTo()** method (since *all* objects are **Object**s), and while we could do a check using **instanceof** there is no meaningful action to take if the object is not an **Employee** other than throwing an exception. In the next lecture we will see how to prevent this issue by using a *type parameter* for the **Comparable** interface.
+The most important thing to think about as you look at this code is the event-driven nature. The **count** field is the "state" of the program stored in the *model*. Mouse click events cause this state to change through the *controller* methods. When the state changes, the panel is redrawn to reflect the state change through the *view* methods.
+
+Here is another example project using a Model/View/Controller architecture:
+
+> [CS201_GUIMVCDemo.zip](CS201_GUIMVCDemo.zip)

@@ -1,223 +1,215 @@
 ---
 layout: default
-title: "Lecture 5: Overloading, JUnit"
+title: "Lecture 5: File I/O, Exceptions"
 ---
 
-<!--
-Note: see the [course notes on arrays](../notes/javaArrays.html) for more detailed information about arrays in Java.
--->
+Note: The [course notes on File I/O and Exceptions](notes/exceptionsFileIO.html) will be useful.
 
-## Overloading
+## File I/O
 
-Unlike in C, Java allows for methods to be *overloaded*, i.e. two methods can have the same name. The requirement for overloaded messages is that they **must have different parameter lists**, i.e. either a different number of parameters or parameters of different types. Overloading provides flexibility when creating classes that have similar behaviors but with different types of data.
+File I/O allows a Java program to read information from files and save information to files.
 
-One common method that is often overloaded is *constructors*. By having multiple constructors, users can create objects in a variety of ways. For example, using the **Dog** class from [Lecture 2](lecture02.html), we can add a second constructor method that takes *no* parameters (often referred to as the *default constructor*)
+There are two general kinds of file I/O: *byte* I/O and *character* I/O.
+
+Byte I/O is useful for reading from and writing to binary files.
+
+Character I/O is useful for reading from and writing to text files.
+
+The **InputStream** and **OutputStream** classes are used to read and write bytes to and from files (and other sources/destinations for binary data).
+
+The **Reader** and **Writer** classes are very much like **InputStream** and **OutputStream**, but they are used to read and write *characters* rather than bytes.
+
+All 4 of the basic Input/OutputStream and Reader/Writer classes come in many different "flavors". For example:
+
+-   **FileInputStream** is an **InputStream** that reads bytes from a file
+-   **FileWriter** is a **Writer** that writes characters to a file
+
+Making the situation even more complicated, some kinds of Stream and Reader/Writer classes are used as "adapters" or "wrappers" to add functionality to another Stream or Reader/Writer object. For example:
+
+-   A **BufferedReader** object can be used as an adapter to make any **Reader** object capable of reading complete lines of text at a time.
+-   A **Scanner** object can be used as an adapter to make any **InputStream** or **Reader** object capable of reading *tokens* of input
+
+One of the keys to writing code to do file I/O in Java is knowing which classes, or combinations of classes, you need to use.
+
+## Reading characters from a file
+
+Here's a program to read every character of text from a **FileReader**, and count the number of occurrences of the vowels A, E, I, O, and U.
 
 {% highlight java %}
-/**
- * A simple Java class representing a Dog.
- */
-public class Dog {
-    private String name;
-    private boolean goodDog;
+package edu.ycp.cs201.countvowels;
 
-    //
-    // Default constructor that takes no parameters
-    //
-    public Dog() {
-        this.name = "Fido";
-        this.goodDog = false;
-    }
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
 
-    // Constructor for Dog objects - should initialize fields
-    public Dog(String name, boolean goodDog) {
-        this.name = name;
-        this.goodDog = goodDog;
-    }
+public class CountVowels {
+    public static void main(String[] args) throws IOException {
+        Scanner keyboard = new Scanner(System.in);
 
-    //
-    public boolean isGoodDog() {
-        return goodDog;
-    }
+        String fileName;
+        System.out.println("Which file? ");
+        fileName = keyboard.next();
 
-    public void giveNewName(String newName) {
-        name = newName;
-    }
+        FileReader reader = new FileReader(fileName);
 
-    public void bark() {
-        System.out.println(name + " barks");
-    }
+        int vowelCount = 0;
 
-    public void respondToCall(String nameCalled) {
-        // Good dogs come when their name is called
-        if (name.equals(nameCalled) && goodDog) {
-            System.out.println(name + " comes");
-        } else {
-            System.out.println(name + " does not respond");
+        while (true){
+            int c = reader.read();
+
+            if (c < 0) {
+                break;
+            }
+
+            char ch = (char) c;
+
+            ch = Character.toLowerCase(ch);
+            if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
+                vowelCount++;
+            }
         }
-    }
+        reader.close();
 
-    public void train() {
-        goodDog = true;
+        System.out.println("The file contains " + vowelCount + " vowel(s)");
     }
 }
 {% endhighlight %}
 
-Then we can create two Dog objects using the different constructors
+Note that when the **read** method returns a negative value, it means that the reader has reached the end of the input file, and there are no more text characters to be read.
+
+Also note that after the program is done using a Stream or a Reader/Writer, it is important to call the **close** method on the object.
+
+Assume that the file **myFile.txt** contains the following text:
+
+    Fourscore and seven years ago...
+
+Running the **CountVowels** program on that file produces the following output:
+
+<pre>
+Which file?
+<b>myFile.txt</b>
+The file contains 11 vowel(s)
+</pre>
+
+## Reading all lines of text from a file
+
+The **BufferedReader** class is handy for reading a text file line-by-line.
+
+Here is a program to find the longest line in an input text file:
 
 {% highlight java %}
-Dog lassie = new Dog("Lassie", true);
-Dog stray = new Dog();
+package edu.ycp.cs201.countvowels;
 
-lassie.respondToCall("Lassie"); // "Lassie comes"
-stray.respondToCall("Lassie");  // "Fido does not respond" (wrong name)
-stray.respondToCall("Fido");    // "Fido does not respond" (not trained)
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class FindLongestLine {
+    public static void main(String[] args) throws IOException {
+        Scanner keyboard = new Scanner(System.in);
+
+        System.out.println("Which file?");
+        String fileName = keyboard.next();
+
+        FileReader fileReader = new FileReader(fileName);
+        BufferedReader reader = new BufferedReader(fileReader);
+
+        int longest = 0;
+
+        while (true) {
+
+            String line = reader.readLine();
+            if (line == null) {
+                break;
+            }
+
+            if (line.length() > longest) {
+                longest = line.length();
+            }
+        }
+
+        reader.close();
+
+        System.out.println("The longest line contained " + longest + " character(s)");
+    }
+}
 {% endhighlight %}
 
-## JUnit
+Note several interesting things going on in this program.
 
-Classes are the "parts" of an object-oriented program.
+The **BufferedReader** object serves as an "adapter" or "wrapper" for the **FileReader**. That means that the **BufferedReader** object uses the **FileReader** object for reading characters, but adds some additional capabilities (specifically, the ability to read complete lines of text.) Here's a picture showing how this works:
 
-Testing makes sure that the parts work correctly. If the individual classes don't work correctly, the overall program is probably not going to work correctly. Therefore, it is very important to have a good set of tests for the classes in your program. 
+> ![image](figures/cs201_lecture6_readers.png)
 
-Rather than continually running a program (which requires creating an application, instantiating an object(s), and manually checking inputs/outputs), instead we can *automate* testing using Java's **JUint** testing framework.
+The **BufferedReader** object contains a reference to the underlying **FileReader** object in one of its (private) fields.
 
-[JUnit](http://junit.org/) is a *unit testing* framework for Java programs. To use JUnit, you write *test classes*. A test class is designed to test one Java class. It contains one or more *test methods*. Each test method is designed to test one particular feature of the class being tested. Often it is preferred to write the tests *before* (or *separate from*) the class as defined by the class *specification*.
+Also note that the **BufferedReader**'s **readLine** method returns the special **null** reference after all of the lines of text in the file have been read.
 
-General structure of a JUnit test class
-=======================================
-
-The test class's fields (member variables) store references to objects (generally, instances of the class being tested). These fields and the objects they point to are called the *test fixture*.
-
-A test class's **setUp** method creates the test fixture objects. This method is called automatically before each test method is called to ensure that the tests are run against fresh objects. It must be marked with the **@Before** annotation.
-
-The test methods call methods on the test fixture objects and check to see that the methods compute the correct result, typically by calling an *assertion method*. Assertion methods are methods defined by the JUnit framework specifically for checking that calls to methods in classes being tested compute the expected result. Each test method must be marked with the **@Test** annotation.
-
-Ideally, a test method should focus on one particular method to be tested.
-
-Kinds of JUnit assertion methods:
-
-{% highlight java %}
-assertEquals(expected, actual); // assert that two values (expected and actual) are equal to each other
-
-assertTrue(value); // assert that a boolean value (condition) is true
-
-assertFalse(value); // assert that a boolean value (condition) is false
-{% endhighlight %}
-
-Most assertions in JUnit test classes will boil down to checking that the return value of a method call is equal to an expected value.
-
-If an assertion is not satisifed, it causes the test method containing the assertion to fail. If all assertions in a test method are satisifed, the test method containing the assertion passes. The goal of testing using JUnit is that all assertions in all test methods should pass.
-
-Eclipse has built-in support for running JUnit tests. To run a JUnit test class within eclipse, right-click on the test class, and choose **Run As...&rarr;JUnit test**. The result will be displayed in the JUnit window:
-
--   Green bar: all of the test methods passed
--   Red bar: at least one of the test methods failed
+Finally, note that calling the **close** method on the **BufferedReader** causes the underlying **FileReader** to be closed.  In general, when your program uses an adapter for a closeable resource such as a reader or writer, the program should call **close** on the adapter.
 
 <div class="callout">
-<b>Caution</b>: Simply passing all unit tests DOES NOT mean the class is CORRECT, only that it produces correct output for the <i>specific</i> input values. However, the more extensive the unit tests are, the more confidence there is in the correctness of the tested methods. It is good practice to write unit tests for <i>boundary</i>, i.e. unexpected, cases as well as invalid inputs.
+Always close the adapter.
 </div>
 
-JUnit Example
-=============
+Running the program on the same text file as the previous example:
 
-As an example, let's consider a **Point** class defined as:
+<pre>
+Which file?
+<b>myFile.txt</b>
+The longest line contained 32 character(s)
+</pre>
+
+## Writing to a text file
+
+The **FileWriter** class is useful for writing text to a text file.
+
+Demo program:
 
 {% highlight java %}
-public class Point {
-  // Fields
-  private int x;
-  private int y;
+package edu.ycp.cs201.countvowels;
 
-  // Constructor
-  public Point(int x, int y) {
-    this.x = x;
-    this.y = y;
-  }
+import java.io.FileWriter;
+import java.io.IOException;
 
-  // Getters
-  public int getX() {
-    return x;
-  }
+public class WriteToFile {
+    public static void main(String[] args) throws IOException {
+        FileWriter writer = new FileWriter("pandp.txt");
 
-  public int getY() {
-    return y;
-  }
+        writer.write("It is a truth universally acknowledged, that a single man in\n");
+        writer.write("possession of a good fortune, must be in want of a wife.\n");
 
-  // Setters
-  public void setX(int x) {
-    this.x = x;
-  }
+        writer.close();
 
-  public void setY(int y) {
-    this.y = y;
-  }
-
-  // Instance print method
-  public void print() {
-    System.out.println("x=" + x + ", y=" + y);
-  }
+        System.out.println("File written successfully!");
+    }
 }
 {% endhighlight %}
 
-Here's a very simple JUnit class for testing the **Point** class. We'll call the test class **PointTest**.
+Note that when calling the **write** to write a string of text, you must manually insert newlines (**\\n**) whenever you want to end a line and begin a new line.
+
+This program writes the first sentence of *Pride and Prejudice* to a file called **pandp.txt**. Running the program produces the following output:
+
+    File written successfully!
+
+After you run the program, right-click on the name of the project and choose **Refresh**. You will see a text file called **pandp.txt** appear in the project. When you open the file, you should see the two files written.
+
+## Exceptions
+
+Note that each demo program had a **main** method that looked like this:
 
 {% highlight java %}
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
-
-public class PointTest {
-  // Create test object references
-  private Point p;
-  private Point q;
-
-  @Before
-  public void setUp() throws Exception {
-    // Instantiate test objects
-    p = new Point(4, 5);
-    q = new Point(13, 14);
-  }
-
-  // Test class methods
-  @Test
-  public void testGetX() throws Exception {
-    assertEquals(4, p.getX());
-    assertEquals(13, q.getX());
-  }
-
-  @Test
-  public void testGetY() throws Exception {
-    assertEquals(5, p.getY());
-    assertEquals(14, q.getY());
-  }
-
-  @Test
-  public void testSetX() throws Exception {
-    p.setX(55);
-    assertEquals(55, p.getX());
-
-    q.setX(101);
-    assertEquals(101, q.getX());
-  }
-
-  @Test
-  public void testSetY() throws Exception {
-    p.setY(1331);
-    assertEquals(1331, p.getY());
-
-    q.setY(90125);
-    assertEquals(90125, q.getY());
-  }
-}
+public static void main(String[] args) throws IOException {
 {% endhighlight %}
 
-This is a very simple example, but it demonstrates the basic idea: for each method in the **Point** class, we want to have one or more test methods which check whether or not the method behaves correctly using some test input. Note that since the setter method does not return a value, we must use the getter method in the unit test, thus there is a dependency so we will want to *ensure* there are unit tests for the getter methods.
+The **throws Exception** part is required because operations such as opening a file, reading from a file, or writing to a file can cause an *exception* to be thrown. Exceptions are a feature of the Java language for allowing programs to handle "exceptional" situations. We will talk more about exceptions next time.
 
-Note that there is one method in **Point** that we didn't test - the **print** method. It is actually quite difficult to test methods that write output to **System.out**.
+## Summary
 
-Summary
-=======
+-   **InputStream**s and **OutputStream**s are used for binary I/O: input and output with raw *bytes* of data. A byte is an 8-bit integer. All data is represented as a sequence of bytes.
+-   **Reader**s and **Writer**s are used for text I/O: input and output using text characters. Text I/O is generally more useful than binary I/O, because information stored as text is meaningful not only to computers but also to people.
+-   **InputStream**s, **OutputStream**s, **Reader**s, and **Writer**s come in different "varieties". For example, a **FileReader** is a variety of **Reader** useful for reading text from a file.
+-   A **BufferedReader** object can *adapt* another **Reader** object to enable it to read complete lines of text using the **readLine** method.
+-   **InputStream**s, **OutputStream**s, **Reader**s, and **Writer**s should be *closed* when the program is done using them. This is done by calling the **close** method. A program that fails to close a stream, reader, or writer has a *resource leak*.
+-   *Exceptions* can occur when doing input and output. An exception is an anomalous event that means that execution of the program cannot continue normally. A method can be declared to *throw* a particular kind of exception.
 
--   *overloading* allows for multiple methods to have the same *name* but different *parameter lists*
--   *JUnit* allows you to test a class by using *assertions* to check that calling methods on objects belonging to that class work correctly

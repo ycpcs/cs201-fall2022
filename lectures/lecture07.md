@@ -1,141 +1,203 @@
 ---
 layout: default
-title: "Lecture 7: Exceptions"
+title: "Lecture 7: Inheritance"
 ---
 
-Note: The [course notes on File I/O and Exceptions](../notes/exceptionsFileIO.html) will be useful.
+<!--
+Note: The [course notes on objects, arrays, and references](../notes/objectsArraysReferences.html) will be useful.
+-->
 
-## Exceptions
+## Inheritance
 
-An *exception* in Java is an unexpected event which makes further progress within a method impossible.
+In addition to *encapsulation*, *inheritance* is a key aspect of object-oriented programming.
 
-For example, we saw last time that when we try to open a file using a **FileInputStream** or **FileReader**, but the file we're trying to open doesn't exist, a **FileNotFoundException** occurs. Because the file cannot be opened, it makes no sense to continue executing the code that will read from the file.
+Inheritance is an *IS-A* relationship between two classes. This allows us to create a new class by *extending* an existing one, i.e. using an existing one and implementing/adding features *specific* to our derived class.
 
-Exceptions are objects. There are some useful methods you can call on an exception object to find out what event caused the exception.
+For example, consider the classes **Vehicle**, **Car**, **Boat**, and **Airplane**.
 
-## Kinds of exceptions
+> A **Car** *is a* **Vehicle**.
+> A **Boat** *is a* **Vehicle**.
+> An **Airplane** *is a* **Vehicle**.
 
-There are two main kinds of exceptions in Java: *checked* and *unchecked*.
+We describe IS-A relationships using a *class hierarchy diagram*:
 
-A *checked* exception is one where the occurrence of the exception is expected at least occasionally: **FileNotFoundException** is a good example, because it's common for a user to type the name of a file that doesn't exist. If it is possible for a checked exception to occur in a method, the method must deal with the exception by either
+> ![image](figures/classHier.png)
 
-1.  *handling* it using **try/catch**
-2.  throwing it out of the method
+The **Car**,. **Boat**, and **Airplane** classes *inherit from* the **Vehicle** class.
 
-Option number 2 is the one you will want to use 90% of the time. Handling an exception using **try/catch** should only be done at a point in the program where there is a reasonable way to recover from the exception.
+### Superclasses and subclasses
 
-An *unchecked* exception is one that typically indicates a bug in the program. For example, dereferencing a null reference (**NullPointerException**), or dividing by zero (**ArithmeticException**). Unchecked exceptions do not have to be dealt with explicitly, and, in general, should not be handled.
+In this class hierarchy, **Vehicle** is the *superclass* of **Car**, **Boat**, and **Airplane**.
 
-## The exception hierarchy
+Equivalently, **Car**, **Boat**, and **Airplane** are *subclasses* of **Vehicle**.
 
-[This will make a bit more sense when we talk about inheritance.]
+Because classes are data types, we also describe an inheritance relationship as a *supertype*/*subtype* relationship.
 
-Java has a hierarchy of exception classes:
+## When Inheritance is Useful
 
-> <img style="width: 36em;" alt="Java exception hierarchy" src="figures/exceptHier.png">
+Inheritance is useful when you have a collection of classes which both *common characteristics* and *behavioral differences*.
 
-The boxes are the exception classes. The arrows represent *Is-A* relationships. For example, an **ArithmeticException** is a **RuntimeException**. That means that aritmetic exceptions are a "kind of" runtime exception.
+The common characteristics of the classes are embodied in the *superclass*. The most important kind of commonality in classes related by inheritance is that they support a common set of *operations* (methods).
 
-All exception classes that are subclasses of **Exception** but not subclasses of **RuntimeException** are checked exceptions. All other exception classes are unchecked exceptions.
+For example, let's say that **Car**, **Boat**, and **Airplane** classes support the following operations:
 
-## Throwing an exception out of a method
+-   They can start a trip
+-   They can move over/through terrain
+-   They can end a trip
 
-The simplest, and usually best, way to deal with an exception that can occur in a method is to *avoid dealing with it*. This option is *throwing the exception out of the method*. To throw a particular class of exceptions out of the method, add a **throws** clause to the method. Example: a method to read the first line of a file and return it as a String:
+These common operations become the methods of the **Vehicle** class, which is the superclass of all three classes.
+
+There are *behavioral* differences in the three classes because they *implement* the common operations differently:
+
+-   A car can start a trip, move, and end a trip only where there are roads. (Airports and marinas are considered to have roads.)
+-   A boat can start a trip, move, and end a trip only where there is water. (A marina is considered to have water.)
+-   An airplane can move over any kind of terrain, but must start and end its trip at airports.
+
+So, for example, if we call the **startTrip** method on an **Airplane** object, it will only succeed if the **Airplane** is currently located at an airport.
+
+## Abstract Methods and Classes
+
+Typically, the methods in the superclass that embody the common operations (methods) shared by subclasses will be *abstract*. This sense of *abstract* means that there is no way to concretely what the operation does unless we know what kind (subclass) of object it is called on.
+
+Because they usually have abstract methods, superclasses are ususally *abstract classes*. An abstract class cannot be directly instantiated.
+
+For example, if I told you I arrived at work in a **Vehicle**, that tells you nothing about whether I arrived by ground, air, or water. That's because you don't know what specific *kind* of **Vehicle** I arrived in.
+
+## The Liskov Substitution Principle, Polymorphism
+
+A simple rule called the *Liskov Substitution Principle* explains how to use inheritance in a program. It states:
+
+> Anywhere in a program an instance of a superclass may be used, an instance of a subclass may be used.
+
+So, if we have a method that takes a parameter whose type is **Vehicle**, we can pass that method a reference to a **Car**, **Boat**, or **Airplane**, since those are all subclasses of **Vehicle**.
+
+The Liskov Substitution Principle allows object-oriented programs to exhibit *polymorphism*. Polymorphism means that a variable with type *A* might, when the program runs, actually refer to an object of type *B*, *C*, *D*, etc. This is possible as long as *B*, *C*, and *D* are all subclasses of *A*.
+
+## An Example
 
 {% highlight java %}
-public static String readFirstLine(String fileName) throws IOException {
-    FileReader fr = new FileReader(fileName);
-    BufferedReader br = new BufferedReader(fr);
-    String firstLine = br.readLine();
-    br.close();
-    return firstLine;
-    // Note: there's something wrong with this method -
-    //       see below under "try/finally"
+public enum Terrain {
+    ROAD,
+    AIRPORT,
+    WATER,
+    MARINA,
+    FIELD,
+    FOREST,
+    MOUNTAIN;
 }
-{% endhighlight %}
 
-By declaring the method **throws IOException**, any **FileNotFoundException** or **IOException** occurring when the method is executed will immediately terminate the method and *propagate the exception to the caller*. In other words, throwing an exception out of a method makes the caller deal with the exception. This is really important:
-
-> **Throwing an exception out of a method transfers the responsibility for dealing with the exception to the caller.**
-
-## Handling an exception using try/catch
-
-In the event that you actually need to handle and recover from an exception, you can use a **try/catch** block.
-
-The **try** block executes some code that might cause an exception to occur. The **catch** block executes some recovery code to be executed in the event that an exception actually does occur.
-
-Example: here's how the code that calls the **readFirstLine** method might use a **try/catch** to handle an recover from an **IOException**:
-
-{% highlight java %}
-try {
-    // The readFirstLine() method might throw a
-    // FileNotFoundException or an IOException
-    String firstLine = readFirstLine("pandp.txt");
-
-    System.out.println("The first line of pandp.txt is:");
-    System.out.println(firstLine);
-} catch (IOException e) {
-    System.out.println("Error: " + e.getMessage());
+public abstract class Vehicle {
+    public abstract boolean startTrip(Terrain t);
+    public abstract boolean endTrip(Terrain t);
+    public abstract boolean move(Terrain t);
 }
-{% endhighlight %}
 
-Any number of **catch** blocks can be added to a single **try**. For example, we could handle the occurrence of a **FileNotFoundException** separately:
-
-{% highlight java %}
-try {
-    // The readFirstLine() method might throw a
-    // FileNotFoundException or an IOException
-    String firstLine = readFirstLine("pandp.txt");
-
-    System.out.println("The first line of pandp.txt is:");
-    System.out.println(firstLine);
-} catch (FileNotFoundException e) {
-    System.out.println("pandp.txt doesn't seem to exist, old chap!");
-} catch (IOException e) {
-    System.out.println("Error: " + e.getMessage());
-}
-{% endhighlight %}
-
-## Cleaning up using try/finally
-
-Recall that we noted that something was wrong with our **readFirstLine** method.
-
-What's wrong with the method is somewhat subtle:
-
--   If the file is opened successfully, **and**
--   an **IOException** occurs trying to read a line from the file, **then**
--   the reader will not be closed
-
-We should always close streams/readers/writers when we're done using them. Exceptions can make guaranteeing that these objects are closed a bit tricky. Fortunately, a construct called **try/finally** helps us ensure that cleanup code is executed both
-
--   when the method completes succesfully, or
--   when the method is abruptly terminated due to an exception
-
-Here's the fixed version
-
-{% highlight java %}
-public static String readFirstLine(String fileName) throws IOException {
-    FileReader fr = new FileReader(fileName);
-    BufferedReader br = new BufferedReader(fr);
-	String firstLine;
-	
-    try {
-        firstLine = br.readLine();
-    } finally {
-        br.close();
+public class Car extends Vehicle {
+    public boolean endTrip(Terrain t) {
+        if ( t == Terrain.AIRPORT || t == Terrain.MARINA ) {
+            return true;
+        } else {
+            return false;
+        }
     }
-    return firstLine;
+
+    public boolean move(Terrain t) {
+        if ( t == Terrain.AIRPORT || t == Terrain.MARINA || t == Terrain.ROAD ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean startTrip(Terrain t) {
+        if ( t == Terrain.AIRPORT || t == Terrain.MARINA ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 {% endhighlight %}
 
-The **finally** block is executed regardless of whether or not an exception occurs executing the code in the **try** block. This makes sure that we are guaranteed to call the **close** method on the **BufferedReader** object.
+A **Trip** consists of a sequence of **Terrain** values:
 
-## Summary
+{% highlight java %}
+public class Trip {
+    private Terrain[] hops;
 
--   Exceptions are anomalous events that mean that the execution of the program cannot continue normally.
--   Exceptions can be *checked* or *unchecked*.
--   A method in which a checked exception can occur must "deal with" the exception by either handling the execption using **try**/**catch** or by throwing the exception out of the method using a **throws** clause.
--   Throwing a method out of a method transfers responsibility for dealing with the exception to the caller.
--   Most of the time throwing the exception out of the method is the best choice. **try**/**catch** should only be used at points in the program where there is a reasonable way to *recover* from the exception, for example by allowing the user to re-enter some input.
--   *Runtime exceptions* are a specific kind of unchecked exception that indicate that there is a bug in the program. Programs should generally never using **try**/**catch** to handle runtime exceptions: instead, you should fix the bug so that the runtime exception does not occur.
+    public Trip(int numHops) {
+        if (numHops < 2) {
+            throw new IllegalArgumentException("Trips must have at least a start and finish");
+        }
+        this.hops = new Terrain[numHops];
+    }
 
+    public void setHop(int hop, Terrain t) {
+        hops[hop] = t;
+    }
+
+    public boolean isTripPossible(Vehicle v) {
+        // Check the first hop
+        if (!v.startTrip(hops[0])) {
+            return false;
+        }
+
+        // Check all hops between the first and last
+        for (int i = 1; i < hops.length - 1; i++) {
+            if (!v.move(hops[i])) {
+                return false;
+            }
+        }
+
+        // Check the last hop
+        if (!v.endTrip(hops[hops.length - 1])) {
+            return false;
+        }
+
+        // success!
+        return true;
+    }
+}
+{% endhighlight %}
+
+The **isTripPossible** method of the **Trip** class takes a **Vehicle** as a parameter, and returns true or false depending on whether or not the **Vehicle** can successfully complete the trip. We see polymorphism at work because an instance of any subclass of **Vehicle** may be passed to **isTripPossible**.
+
+We can use the **Trip** class to write JUnit tests which test the **Car** class.
+
+For example, a trip starting at an airport, continuing through roads, and ending at a marina is a legal trip. A trip blocked by a terrain type inaccessible to a **Car**, such as **WATER**, is not a legal trip.
+
+{% highlight java %}
+public class CarTest extends TestCase {
+    private Trip legalTrip;
+    private Trip illegalTrip;
+    private Car myCar;
+
+    protected void setUp() throws Exception {
+        // a Trip that can be completed by Car
+        legalTrip = new Trip(4);
+        legalTrip.setHop(0, Terrain.AIRPORT);
+        legalTrip.setHop(1, Terrain.ROAD);
+        legalTrip.setHop(2, Terrain.ROAD);
+        legalTrip.setHop(3, Terrain.MARINA);
+
+        // a Trip that cannot be completed by Car
+        // because it contains a hop through WATER
+        illegalTrip = new Trip(5);
+        illegalTrip.setHop(0, Terrain.AIRPORT);
+        illegalTrip.setHop(1, Terrain.ROAD);
+        illegalTrip.setHop(2, Terrain.ROAD);
+        illegalTrip.setHop(3, Terrain.WATER);   // Not possible by Car!
+        illegalTrip.setHop(4, Terrain.MARINA);
+
+        myCar = new Car();
+    }
+
+    public void testLegalTrip() throws Exception {
+        assertTrue(legalTrip.isTripPossible(myCar));
+    }
+
+    public void testIllegalTrip() throws Exception {
+        assertFalse(illegalTrip.isTripPossible(myCar));
+    }
+}
+{% endhighlight %}
