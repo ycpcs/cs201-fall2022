@@ -1,11 +1,11 @@
 ---
 layout: default
-title: "Lab 10: Comparable, Sorting"
+title: "Lab 10: Drag and Drop GUI"
 ---
 
 ## Getting Started
 
-Download [CS201\_Lab10\_Gradle.zip](CS201_Lab10_Gradle.zip). Copy and extract the zip file into your **CS201-Spring2022** directory. Import it into your **CS201-Spring2022** IntelliJ project using
+Download [CS201\_Lab10\_Gradle.zip](CS201_Lab10_Gradle.zip). Copy and extract the zip file into your **CS201-Fall2022** directory. Import it into your **CS201-Fall2022** IntelliJ project using
 
 > **File&rarr;New&rarr;Module from Existing Sources...**
 
@@ -13,53 +13,47 @@ Select the **CS201\_Lab10\_Gradle** directory and in the **Import Module** dialo
 
 You should see a project called **CS201\_Lab10\_Gradle** in the Project window.
 
-**There is no executable application for this lab.** Instead, we will test the class implementation by running the unit tests by right-clicking on the file **CardTest.java** in the **src/test/java/** directory, and then choosing
+Run the program by right-clicking on the file **CirclesFrame.java** in the **src/main/java/** directory, and then choosing
 
-> **Run 'CardTest'**
+> **Run 'CirclesFrame.main()'**
 
-Or subsequently by selecting **CardTest** from the dropdown list in the top right corner of the IDE and clicking the green arrow.
+Or subsequently by selecting **CirclesFrame** from the dropdown list in the top right corner of the IDE and clicking the green arrow.
 
 ## Your Task
 
-### Part 1 - Define a Card class
+Modify the program so that it allows the user to drag an outline of a circle around the screen with the mouse, place the circle when the left mouse button is clicked, and increasing its radius when the right button is clicked. You should also keep track of the number of circles that have been placed.
 
-Define two **enum** types called **Suit** and **Rank**. The **Suit** enumeration should contain values for the suits *clubs* (lowest suit), *diamonds*, *hearts*, and *spades* (highest suit). The **Rank** enumeration should contain values for each playing card rank - two (lowest rank) through ten, jack, queen, king, then ace (highest rank).
+## Hints
 
-> **Note**: specify the members of each enumeration in order from lowest to highest. I.e., **CLUBS** should be the first value in **Suit**, and **TWO** should be the first value in **Rank**. This will make it easy to compare suit and rank values.
+-   A **Circle** class has been provided that defines a circle using its *center* coordinates and *radius*. Since this class has *no setters* it is *immutable*, i.e. once the object is created, it's fields cannot be changed. **DO NOT MODIFY THIS CLASS.**
 
-Define a class called **Card**. An instance of **Card** represents a playing card. It should have fields to store a **Card**'s suit and rank, and a constructor to initialize them. Add getter methods to get a card's suit and rank.
+-   Consider what information the model class should contain. You can use a **Circle** object for the placed circle.
 
-Write JUnit tests to test the card class. You should create a number of **Card** objects with different suits and ranks, and test that the getter methods work on these objects.
+-   The **CirclesPanel** class should contain a field for the model as well as fields for the outlined circle's center and radius. The initial radius can be set to **CirclesModel.START_R**.
 
-### Part 2 - Comparing Cards
-
-Once you have Part 1 working, change the **Card** class to implement the **java.lang.Comparable** interface. The **Card** class's **compareTo** method should compare first by suit, then by rank. So, a two of diamonds would compare as greater than an ace of clubs, because diamonds is a higher suit than clubs. Of course, three of diamonds would compare as greater than two of diamonds.
-
-You will see a warning about **Comparable** being a raw type. Ignore this warning for now: we will see how to fix it in the next lab.
-
-Note that enumeration types automatically implement the **Comparable** interface, so you can call the **compareTo** method on enumeration members. The comparison result will correspond to the order in which the enumeration members were defined, with earlier members comparing as less than later members.
-
-Add some JUnit tests to test comparing **Card** objects using the **compareTo** method.
-
-### Part 3 - Sorting Cards
-
-Finally, demonstrate that if you can compare cards, then an array of cards can be sorted using the **java.util.Arrays.sort** static method.
-
-As one of the objects in your test fixture, create an array of **Card** objects. You can use the **Card** objects you've already created as element values. Make sure that the elements of the array are not already sorted.
-
-Write a test method to sort the array. It should look something like this:
+-   Use the **handleMouseMove** controller method for when the mouse is being moved. This method should update the outline center fields with the current mouse position coordinates. You can get the coordinates of the mouse pointer using the **e** parameter to store into the **x** and **y** fields as follows:
 
 {% highlight java %}
-public void testSort() {
-  Arrays.sort(myArray);
-
-  // now verify that the elements of the array are in sorted order
-  assertEquals(lowestCard, myArray[0]);
-  assertEquals(secondLowestCard, myArray[1]);
-
-  // etc...
-}
+    x = e.getX();
+    y = e.getY();
 {% endhighlight %}
+
+-   Use the **handleMouseClick** controller method for when a mouse button is clicked. This method should make a new circle (consider the **addCircle** model method) when the left button is clicked as well as increment the counter and reset the outline radius. When the right button is clicked it should increment the radius of the outline by **CirclesModel.START_R**. You can check to see which mouse button was clicked as follows:
+
+{% highlight java %}
+
+    if (e.getButton() == MouseEvent.BUTTON1) {
+        // left button
+        ...
+    } else if (e.getButton() == MouseEvent.BUTTON3) {
+        // right button
+        ...
+    }
+{% endhighlight %}
+
+-   After the event handlers update the model, call **repaint()** to refresh the view.
+
+-   Use the **drawOval** and **fillOval** methods to draw the circles. Note that to draw a circle using these methods, the parameters are the *upper-left* corner of a bounding rectangle/square, and the width and height of the rectangle. Consider how the center and radius relate to the drawing parameters. **DO NOT MODIFY THE MODEL FIELDS**.
 
 ## Submitting
 
@@ -67,7 +61,7 @@ When you are done, submit the lab to the Marmoset server using the Terminal wind
 
 <pre>
 $ <b>cd CS201_Lab10_Gradle</b>
-CS201-Spring2022/CS201_Lab10_Gradle
+CS201-Fall2022/CS201_Lab10_Gradle
 $ <b>make submit</b>
 </pre>
 
@@ -82,7 +76,7 @@ check that the files you submitted are correct.
 
 Details:
 
-         Semester:   Spring 2022
+         Semester:   Fall 2022
          Course:     CS 201
          Assignment: lab10
 

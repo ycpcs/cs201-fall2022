@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Lab 7: Exceptions"
+title: "Lab 7: Inheritance and Polymorphism"
 ---
 
 ## Getting Started
@@ -13,57 +13,27 @@ Select the **CS201\_Lab07\_Gradle** directory and in the **Import Module** dialo
 
 You should see a project called **CS201\_Lab07\_Gradle** in the Project window.
 
-Run the program by right-clicking on the file **ReadFile.java** in the **src/main/java/** directory, and then choosing
+**There is no executable application for this lab.** Instead, we will test the class implementations by running the unit tests by right-clicking on the files **CarTest.java**, **BoatTest.java**, and **AirplaneTest.java** in the **src/test/java/** directory, and then choosing
 
-> **Run 'ReadFile.main()'**
+> **Run 'CarTest'**
 
-Or subsequently by selecting **ReadFile** from the dropdown list in the top right corner of the IDE and clicking the green arrow.
+(and similarly for **BoatTest** and **AirplaneTest**). Or subsequently by selecting **CarTest**, etc. from the dropdown list in the top right corner of the IDE and clicking the green arrow.
 
-## Your task
+## Your Task
 
-You will make changes to the class called **ReadFile**.
+Add classes called **Boat** and **Airplane**. They should have the following behavior:
 
-Complete the progam so that it prints the contents of the file specified by the user (code is provided for user input) to **System.out**.
+-   A legal trip for a **Boat** must start and end at a marina, and must not contain any hops over terrain other than water or marina.
 
-There are several important requirements:
+-   A legal trip for an **Airplane** must start and end at an airport, but may continue through any kind of terrain.
 
--   The **main** method must not be declared to throw any kind of exception.
--   The program must not test whether or not the requested file exists before attempting to open it.
--   The program must use a **try/finally** block to make sure that the reader or input stream reading the file is closed before the program exits.
+Add new JUnit test classes called **BoatTest** and **AirplaneTest** that test **Boat** and **Airplane** objects (respectively) against both legal and illegal trips.
 
-There is a file **myFile.txt** provided that contains the following contents:
+You can use the provided **Car** and **CarTest** classes as a guide.
 
-    Oh freddled gruntbuggly
-    Thy micturations are to me
-    As plurdled gabbleblotchits on a lurgid bee.
-    Groop I implore thee, my foonting turlingdromes
-    And hooptiously drangle me with crinkly bindlewurdles,
-    Or I will rend thee in the gobberwarts with my blurglecruncheon,
-    See if I don't!
+## Testing
 
-Here is an example session showing a file being printed successfully (user input in **bold**):
-
-<pre>
-Which file? <b>myFile.txt</b>
-Oh freddled gruntbuggly
-Thy micturations are to me
-As plurdled gabbleblotchits on a lurgid bee.
-Groop I implore thee, my foonting turlingdromes
-And hooptiously drangle me with crinkly bindlewurdles,
-Or I will rend thee in the gobberwarts with my blurglecruncheon,
-See if I don't!
-</pre>
-
-Here is another example session showing what happens when the user enters the name of a nonexistent file:
-
-<pre>
-Which file? <b>nonexistent.txt</b>
-Error: nonexistent.txt (No such file or directory)
-</pre>
-
-## Hints
-
-Use a **try/catch** block to handle an **IOException** or **FileNotFoundException** that might occur. Print the error message from the catch block. You can call the **getMessage** method on the caught exception object to get a string containing a textual description of the error that caused the exception.
+In **src/test/java/(default package)** right-click on the appropriate test class and choose **Run As...&rarr;JUnit Test**. This will run the JUnit tests for the corresponding class. If you have correctly implemented the class, you will see a green bar, indicating that all tests have succeeded.
 
 ## Submitting
 

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Lab 6: Text File I/O"
+title: "Lab 6: Exceptions"
 ---
 
 ## Getting Started
@@ -13,46 +13,57 @@ Select the **CS201\_Lab06\_Gradle** directory and in the **Import Module** dialo
 
 You should see a project called **CS201\_Lab06\_Gradle** in the Project window.
 
-Run the program by right-clicking on the file **Remember.java** in the **src/main/java/** directory, and then choosing
+Run the program by right-clicking on the file **ReadFile.java** in the **src/main/java/** directory, and then choosing
 
-> **Run 'Remember.main()'**
+> **Run 'ReadFile.main()'**
 
-Or subsequently by selecting **Remember** from the dropdown list in the top right corner of the IDE and clicking the green arrow.
+Or subsequently by selecting **ReadFile** from the dropdown list in the top right corner of the IDE and clicking the green arrow.
 
-Here is an example session showing what should happen the *first* time someone runs the program (user input in **bold**):
+## Your task
+
+You will make changes to the class called **ReadFile**.
+
+Complete the progam so that it prints the contents of the file specified by the user (code is provided for user input) to **System.out**.
+
+There are several important requirements:
+
+-   The **main** method must not be declared to throw any kind of exception.
+-   The program must not test whether or not the requested file exists before attempting to open it.
+-   The program must use a **try/finally** block to make sure that the reader or input stream reading the file is closed before the program exits.
+
+There is a file **myFile.txt** provided that contains the following contents:
+
+    Oh freddled gruntbuggly
+    Thy micturations are to me
+    As plurdled gabbleblotchits on a lurgid bee.
+    Groop I implore thee, my foonting turlingdromes
+    And hooptiously drangle me with crinkly bindlewurdles,
+    Or I will rend thee in the gobberwarts with my blurglecruncheon,
+    See if I don't!
+
+Here is an example session showing a file being printed successfully (user input in **bold**):
 
 <pre>
-No one has run this program before!
-What is your name? <b>Alice</b>
-Ok, Alice, I'm writing your name to a file
+Which file? <b>myFile.txt</b>
+Oh freddled gruntbuggly
+Thy micturations are to me
+As plurdled gabbleblotchits on a lurgid bee.
+Groop I implore thee, my foonting turlingdromes
+And hooptiously drangle me with crinkly bindlewurdles,
+Or I will rend thee in the gobberwarts with my blurglecruncheon,
+See if I don't!
 </pre>
 
-An example session showing what happens the *second* time someone runs the program (user input in **bold**):
+Here is another example session showing what happens when the user enters the name of a nonexistent file:
 
 <pre>
-The last person to run the program was Alice
-What is your name? <b>Bob</b>
-Ok, Bob, I'm writing your name to a file
+Which file? <b>nonexistent.txt</b>
+Error: nonexistent.txt (No such file or directory)
 </pre>
-
-The next time someone runs the program, it will print Bob's name as the last person to run the program.
 
 ## Hints
 
-Store the name of the last person to run the program in a text file.
-
-You can use a **FileReader** and **BufferedReader** to read from the file, and a **FileWriter** to create the file.
-
-You will need to be able to determine whether or not the file containing the name has been created. You can do so as follows. The variable **fileName** is a String which is provided that contains the filename (and path) in which the name should be stored:
-
-    File f = new File(fileName);
-    if (f.exists()) {
-        // the file exists
-    } else {
-        // the file has not been created yet
-    }
-
-Once the file is created, it should appear in the **CS201\_Lab06\_Gradle** directory.
+Use a **try/catch** block to handle an **IOException** or **FileNotFoundException** that might occur. Print the error message from the catch block. You can call the **getMessage** method on the caught exception object to get a string containing a textual description of the error that caused the exception.
 
 ## Submitting
 

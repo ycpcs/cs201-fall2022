@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Lab 5: Testing Overloaded Constructors"
+title: "Lab 5: Text File I/O"
 ---
 
 ## Getting Started
@@ -13,39 +13,46 @@ Select the **CS201\_Lab05\_Gradle** directory and in the **Import Module** dialo
 
 You should see a project called **CS201\_Lab05\_Gradle** in the Project window.
 
-To begin, run the program by right-clicking on the file **StartLab.java** in the **src/main/java/** directory, and then choosing
+Run the program by right-clicking on the file **Remember.java** in the **src/main/java/** directory, and then choosing
 
-> **Run 'StartLab.main()'**
+> **Run 'Remember.main()'**
 
-In the console window, type **yes** when prompted which should copy the **Coins.java** and **CoinsTest.java** files from your [Lab 2](lab02.html).
+Or subsequently by selecting **Remember** from the dropdown list in the top right corner of the IDE and clicking the green arrow.
 
-In this lab, you will build upon the classes from [Lab 2](lab02.html) to add several overloaded constructors along with corresponding unit tests.
+Here is an example session showing what should happen the *first* time someone runs the program (user input in **bold**):
 
-**There is no executable application for this lab.** Instead, we will test the class implementation by running the unit tests by right-clicking on the file **CoinsTest.java** in the **src/test/java/** directory, and then choosing
+<pre>
+No one has run this program before!
+What is your name? <b>Alice</b>
+Ok, Alice, I'm writing your name to a file
+</pre>
 
-> **Run 'CoinsTest (1)'**
+An example session showing what happens the *second* time someone runs the program (user input in **bold**):
 
-Or subsequently by selecting **CoinsTest** from the dropdown list in the top right corner of the IDE and clicking the green arrow.
+<pre>
+The last person to run the program was Alice
+What is your name? <b>Bob</b>
+Ok, Bob, I'm writing your name to a file
+</pre>
 
-## Your Task
+The next time someone runs the program, it will print Bob's name as the last person to run the program.
 
-Make the following modifications to the **Coins** class:
+## Hints
 
-**(1)** Add a *default* constructor that takes **no** parameters and initializes all the fields to 0 *except* for 1 penny.
+Store the name of the last person to run the program in a text file.
 
-**(2)** Add a single parameter constructor that takes a **double** as a total starting amount *in dollars* and calculates the number of each denomination of coin. To accomplish this, you will need to convert the parameter to an *integer* number of cents and then repeatedly use integer division starting with the largest denomination (quarters) to determine the maximum number of each denomination this amount contains. Be sure to remove the amount of each denomination from the total before calculating the number of coins in the next smaller denomination.
+You can use a **FileReader** and **BufferedReader** to read from the file, and a **FileWriter** to create the file.
 
-**(3)** Add a single parameter constructor that takes a **Coins** object and initializes the fields to the same values as the parameter object. **Note:** This is essentially making a *copy* of the parameter object. It is good practice to use the getter methods for the parameter object, however since the object is in the *same* class, the fields can actually be accessed directly.
+You will need to be able to determine whether or not the file containing the name has been created. You can do so as follows. The variable **fileName** is a String which is provided that contains the filename (and path) in which the name should be stored:
 
-**(4)** Add an **equals** method that takes a **Coins** object as a parameter and returns a **boolean**. The method should return **true** if all the fields of the class are equal to those of the parameter, and **false** otherwise.
+    File f = new File(fileName);
+    if (f.exists()) {
+        // the file exists
+    } else {
+        // the file has not been created yet
+    }
 
-Make the following modifications to the **CoinsTest** class:
-
-**(1)** Add several additional test **Coins** references.
-
-**(2)** In the **setUp** method, instantiate *at least* one new **Coins** object using each of the new constructors.
-
-**(3)** Add assert tests in the various getter test methods to check for proper initialization of the fields in the new test objects. **Note:** For the object instantiated using the **Coins** object parameter, use an **assertTrue** test that checks **both** that the *field* values are equal **and** the references for the new object and the one passed to the constructor are **different**.
+Once the file is created, it should appear in the **CS201\_Lab05\_Gradle** directory.
 
 ## Submitting
 
