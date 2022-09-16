@@ -12,7 +12,7 @@ Assignments are due by 11:59 PM on the due date, although I will **NOT** assess 
 
 > Assignment | File | Due
 > ---------- | ---- | ---
-> [Assignment 1: Disk Game](assign01.html) | [CS201\_Assign01\_Gradle.zip](CS201_Assign01_Gradle.zip) | MS1 Mon, Sept 6th<br>MS2 Fri, Sept 16th
+> Assignment 1: Yatzee Game |[Assignment 01: Yatzee!!!](Assignment_01_Yatzee.pdf) |MS1 Fri, Sept 16th<br>MS2 Sun, Sept 25th<br>MS3 Fri, Oct 7th
 
 
 <!--
