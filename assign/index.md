@@ -13,6 +13,9 @@ Assignments are due by 11:59 PM on the due date, although I will **NOT** assess 
 > Assignment | File | Due
 > ---------- | ---- | ---
 > Assignment 1: Yatzee Game |[Assignment 01: Yatzee!!!](Assignment_01_Yatzee.pdf) |MS1 Fri, Sept 16th<br>MS2 Sun, Sept 25th<br>MS3 Fri, Oct 7th
+> Assignment 2: Database |[Assignment 02: Database!!!](Assignment_2_milestone_1-Database.pdf) |MS1 Sun, Oct 30th<br>
+> Assignment 2: Database |[Assignment 02: Database Manager!!!](Assignment_2_milestone_2-Database_Manager.pdf) |MS2 Sun, Nov 06th<br>
+> Assignment 2: Database |[Assignment 02: Database Features!!!](Assignment_2_milestone_3-Database_Features.pdf) |MS2 Sun, Nov 13th<br>
 
 
 <!--
