@@ -5,7 +5,7 @@ title: "Lab 16: Generic Algorithms"
 
 ## Getting Started
 
-Download [CS201\_Lab16\_Gradle.zip](CS201_Lab16_Gradle.zip). Copy and extract the zip file into your **CS201-Spring2022** directory. Import it into your **CS201-Spring2022** IntelliJ project using
+Download [CS201\_Lab16\_Gradle.zip](CS201_Lab16_Gradle.zip). Copy and extract the zip file into your **CS201-Fall2022** directory. Import it into your **CS201-Fall2022** IntelliJ project using
 
 > **File&rarr;New&rarr;Module from Existing Sources...**
 
@@ -56,7 +56,7 @@ When you are done, submit the lab to the Marmoset server using the Terminal wind
 
 <pre>
 $ <b>cd CS201_Lab16_Gradle</b>
-CS201-Spring2022/CS201_Lab16_Gradle
+CS201-Fall2022/CS201_Lab16_Gradle
 $ <b>make submit</b>
 </pre>
 
@@ -71,7 +71,7 @@ check that the files you submitted are correct.
 
 Details:
 
-         Semester:   Spring 2022
+         Semester:   Fall 2022
          Course:     CS 201
          Assignment: lab16
 
