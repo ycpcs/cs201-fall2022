@@ -106,6 +106,9 @@ courseInfo.classPeriods = [
  		reading: "6.5",
  		lab: new NumberedLabGradle(17, "List Reversal")
  	},
+	{
+ 		topic: new Topic("", "")
+ 	},
  	{
  		topic: new Topic("Exam 2 Review", "")
  	},
