@@ -29,6 +29,11 @@ For CS 201 Section 102, please click on this link [CS201 Section 102](https://yc
 
 ## News
 * **Aug 22** &mdash; Welcome back!
+ **Nov 6** &mdash; [Assignment 02: Database Manager!!!](assign/Assignment_2_milestone_2-Database_Manager.pdf) is due.
+* **Thursday Nov 10  - Exam 2**
+* **Nov 13** &mdash; [Assignment 02: Database Features!!!](assign/Assignment_2_milestone_3-Database_Features.pdf) is due.
+* **Thursday, Dec 1** &mdash; **Exam 3**
+* **THURSDAY DEC 8 12:45 pm-2:45 pm - FINAL EXAM CS201.103**
 
 
 <!--
